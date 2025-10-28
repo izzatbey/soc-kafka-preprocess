@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"testing"
-	"preprocess-service/data"
+	"github.com/izzatbey/soc-kafka-preprocess/data"
 	"github.com/tidwall/gjson"
 )
 

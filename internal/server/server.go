@@ -8,8 +8,8 @@ import (
 	"os"
 	"time"
 
-	"preprocess-service/internal/kafka"
-	"preprocess-service/internal/preprocess"
+	"github.com/izzatbey/soc-kafka-preprocess/internal/kafka"
+	"github.com/izzatbey/soc-kafka-preprocess/internal/preprocess"
 )
 
 func Start() {

@@ -2,7 +2,7 @@ package main
 
 import (
 	"log"
-	"preprocess-service/internal/server"
+	"github.com/izzatbey/soc-kafka-preprocess/internal/server"
 )
 
 func main() {
