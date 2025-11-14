@@ -8,18 +8,24 @@ import (
 	"os"
 	"time"
 
+	"github.com/izzatbey/soc-kafka-preprocess/internal/config"
 	"github.com/izzatbey/soc-kafka-preprocess/internal/kafka"
 	"github.com/izzatbey/soc-kafka-preprocess/internal/preprocess"
 )
 
-func Start() {
-	producer := kafka.NewProducer()
+func Start(cfg *config.Config) {
+	producer := kafka.NewProducerWithBroker(cfg.KafkaBroker)
 	defer producer.Close()
 
 	http.HandleFunc("/ingest", func(w http.ResponseWriter, r *http.Request) {
 		body, err := io.ReadAll(r.Body)
 		if err != nil {
 			http.Error(w, "Failed to read body", http.StatusBadRequest)
+			return
+		}
+
+		if len(body) == 0 {
+			http.Error(w, "Empty body", http.StatusBadRequest)
 			return
 		}
 
@@ -40,10 +46,22 @@ func Start() {
 
 		for _, logData := range logs {
 			raw, _ := json.Marshal(logData)
-			processed := preprocess.ApplyPreprocessRules(string(raw))
+			processed := preprocess.ApplyPreprocessRules(string(raw), cfg.LogTag)
+
+			if processed == "" {
+				continue
+			}
 
 			var dynamic map[string]interface{}
-			json.Unmarshal([]byte(processed), &dynamic)
+			if err := json.Unmarshal([]byte(processed), &dynamic); err != nil {
+				log.Printf("skipping invalid processed JSON: %v", err)
+				continue
+			}
+
+			if dynamic == nil {
+				dynamic = make(map[string]interface{})
+			}
+
 			dynamic["@timestamp"] = time.Now().Format(time.RFC3339Nano)
 
 			finalJSON, _ := json.Marshal(dynamic)

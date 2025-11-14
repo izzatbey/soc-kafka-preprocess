@@ -13,6 +13,10 @@ type Producer struct {
 
 func NewProducer() *Producer {
 	broker := os.Getenv("KAFKA_BROKER")
+	return NewProducerWithBroker(broker)
+}
+
+func NewProducerWithBroker(broker string) *Producer {
 	if broker == "" {
 		broker = "localhost:9092"
 	}
