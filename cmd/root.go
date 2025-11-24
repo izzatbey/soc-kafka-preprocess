@@ -26,6 +26,5 @@ func Execute() {
 }
 
 func init() {
-	// Load .env / environment variables once globally
 	cfg = config.Load()
 }
